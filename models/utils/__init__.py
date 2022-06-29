@@ -1,0 +1,1 @@
+from .architectures import define_D, define_G

@@ -1,0 +1,16 @@
+h5py==3.7.0
+histomicstk==1.2.1
+matplotlib==3.5.2
+numpy==1.22.3
+opencv_python==4.6.0.66
+openslide_python==1.2.0
+pandas==1.4.3
+Pillow==9.1.1
+scikit_image==0.19.2
+scikit_learn==1.1.1
+scikit_optimize==0.9.0
+scipy==1.7.3
+skimage==0.0
+torch==1.11.0
+torchvision==0.12.0
+tqdm==4.64.0
