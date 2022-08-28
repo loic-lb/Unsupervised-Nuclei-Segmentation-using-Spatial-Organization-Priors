@@ -102,9 +102,9 @@ def main():
                                         kind='overlay')
             # plt.figure(), plt.imshow(instanceMap_RGB)
             # plt.show()
-            imsave(os.path.join(result_dir,imgPath.split("/")[-1].split(".")[0]) + '_overlay.png', instanceMap_RGB)
-            imsave(os.path.join(result_dir,imgPath.split("/")[-1].split(".")[0]) + '_instances.png', instanceMap * 255)
-            imsave(os.path.join(result_dir,imgPath.split("/")[-1].split(".")[0]) + '_points.png', np.uint8(255 * np.sum(nucPoints, axis=(0, 3))))
+            imsave(os.path.join(result_dir,imgPath.split("/")[-1].split(".")[0]) + '-overlay.png', instanceMap_RGB)
+            imsave(os.path.join(result_dir,imgPath.split("/")[-1].split(".")[0]) + '-instances.png', instanceMap * 255)
+            imsave(os.path.join(result_dir,imgPath.split("/")[-1].split(".")[0]) + '-points.png', np.uint8(255 * np.sum(nucPoints, axis=(0, 3))))
             # plt.figure(),plt.imshow(img)
 
         if config.application == 'Gland':

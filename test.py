@@ -87,7 +87,7 @@ def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     if args.method == "GAN":
         if os.path.isfile(os.path.join(args.checkpoint_path, "G_losses_system.pickle")):
-            G_losses_system = load_pickle_file(os.path.join(args.checkpoint_path, "G_losses_GAN.pickle"))
+            G_losses_system = load_pickle_file(os.path.join(args.checkpoint_path, "G_losses_system.pickle"))
             start_idx = min(args.start_epoch_checkpoint, len(G_losses_system) - 1)
             best_idx = np.argmin(G_losses_system[start_idx:]) + start_idx
             checkpoint = torch.load(os.path.join(args.checkpoint_path, f"model_epoch{best_idx}.pt"))

@@ -9,10 +9,10 @@ fashion
 * ```test.py``` computes every metrics for all the benchmarked methods.
 
 ## Installation
-The packages needed to run the code are provided in ```requirements.txt```. The environment can be recreated using:
+The packages needed to run the code are provided in ```environment.yml```. The environment can be recreated using:
 
 ```
-conda create --name <env_name> --file requirements.txt
+conda env create -f environment.yml
 ```
 
 ## Data
