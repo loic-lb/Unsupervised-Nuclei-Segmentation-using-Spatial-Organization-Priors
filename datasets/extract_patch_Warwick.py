@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pandas as pd
 from tqdm import tqdm
-os.add_dll_directory("C:/Users/L_LE-BESCOND/AppData/Local/Programs/Python/openslide-win64-20171122/bin")
 from utils import WholeSlideImage
 
 
