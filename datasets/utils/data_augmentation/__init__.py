@@ -1,1 +1,1 @@
-from .colortransform import create_color_transform, create_data_ihc_aug
+from .colortransform import *

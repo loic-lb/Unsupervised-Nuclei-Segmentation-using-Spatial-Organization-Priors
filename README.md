@@ -45,8 +45,9 @@ python train.py /path/to/DeepLiif/ /path/to/PanNuke/ deepliif
 * ```method``` specifies the method to benchmark ("GAN", "Unet", "Stardist", "Nuclick", "Thresholding")
 *  ```dataset_name``` specifies which dataset is used among Deepliif and Warwick (only these 2 were used in this paper to compute metrics).
 * Depending on the chosen method, ```--benchmark_path``` or ```--checkpoint_path``` must be provided:
-  * ```--checkpoint_path``` describes the location of best saved models for "GAN" and "Unet" methods (must contain model checkpoints and 
-training losses for "GAN" and optimal hyperparameters for "Unet")
+  * ```--checkpoint_path``` describes the location of best saved models for "GAN" and "Unet" methods. It must contain model checkpoints and 
+training losses for "GAN" to select the best model over training iterations. If already selected, you may just indicate the path to
+the model, named: "proposed_{deepliif/warwick}.pt" as it is done for provided pretrained models. It must contain optimal hyperparameters for "Unet".
   * ```--benchmark_path``` describes the location of the mask computed with existing methods ("Stardist", "Nuclick", "Thresholding")
 
 Example command line:

@@ -36,6 +36,9 @@ def main():
     if not os.path.isfile(optimal_parameters_file_path):
         raise ValueError("Please provide a valid path for experiment results")
 
+    mean = 0.5
+    std = 0.5
+
     if args.dataset_name == "deepliif":
         dataset_ihc_train_path = os.path.join(args.dataihcroot_images, "DeepLIIF_Training_Set")
         dataset_ihc_val_path = os.path.join(args.dataihcroot_images, "DeepLIIF_Validation_Set")
@@ -49,8 +52,8 @@ def main():
                                                        transforms.RandomHorizontalFlip(),
                                                        transforms.RandomCrop((256, 256)),
                                                        transforms.ToTensor(),
-                                                       transforms.Normalize((0.5, 0.5, 0.5),
-                                                                            (0.5, 0.5, 0.5))]),
+                                                       transforms.Normalize((mean, mean, mean),
+                                                                            (std, std, std))]),
                                                    mask_transform=transforms.Compose([transforms.RandomChoice(
                                                        [transforms.RandomRotation((0, 0)),
                                                         transforms.RandomRotation((90, 90)),
@@ -64,9 +67,9 @@ def main():
         dataset_ihc_val = DeepLIIFImgMaskDataset(dataset_ihc_val_path,
                                                  img_transform=transforms.Compose([transforms.ToTensor(),
                                                                                    transforms.Normalize(
-                                                                                       (0.5, 0.5, 0.5),
-                                                                                       (0.5, 0.5,
-                                                                                        0.5))]),
+                                                                                       (mean, mean, mean),
+                                                                                       (std, std,
+                                                                                        std))]),
                                                  mask_transform=transforms.ToTensor())
     else:
         raise NotImplementedError
@@ -106,7 +109,7 @@ def main():
         with tqdm(dataloader_ihc_train, unit="batch") as tepoch:
             tepoch.set_description(f"Epoch {epoch}, training :")
             for data, target in tepoch:
-                data_aug = create_data_ihc_aug(data, color_transform).to(device)
+                data_aug = create_data_ihc_aug(data, color_transform, mean, std).to(device)
                 data, target = data.to(device), target.to(device)
                 model.train()
                 optimizer.zero_grad()
@@ -129,7 +132,7 @@ def main():
         cumul_perf = 0
         with torch.no_grad():
             for data, target in dataloader_ihc_val:
-                data_aug = create_data_ihc_aug(data, color_transform).to(device)
+                data_aug = create_data_ihc_aug(data, color_transform, mean, std).to(device)
                 data, target = data.to(device), target.to(device)
                 model.eval()
                 pred = model(data)

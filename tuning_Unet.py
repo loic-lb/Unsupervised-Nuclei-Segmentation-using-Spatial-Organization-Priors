@@ -40,6 +40,9 @@ def main():
                         help='Number of worker nodes (default: 5)')
     args = parser.parse_args()
 
+    mean = 0.5
+    std = 0.5
+
     if args.dataset_name == "deepliif":
         dataset_ihc_train_path = os.path.join(args.dataihcroot_images, "DeepLIIF_Training_Set")
         dataset_ihc_val_path = os.path.join(args.dataihcroot_images, "DeepLIIF_Validation_Set")
@@ -53,8 +56,8 @@ def main():
                                                        transforms.RandomHorizontalFlip(),
                                                        transforms.RandomCrop((256, 256)),
                                                        transforms.ToTensor(),
-                                                       transforms.Normalize((0.5, 0.5, 0.5),
-                                                                            (0.5, 0.5, 0.5))]),
+                                                       transforms.Normalize((mean, mean, mean),
+                                                                            (std, std, std))]),
                                                    mask_transform=transforms.Compose([transforms.RandomChoice(
                                                        [transforms.RandomRotation((0, 0)),
                                                         transforms.RandomRotation((90, 90)),
@@ -67,9 +70,9 @@ def main():
                                                    )
         dataset_ihc_val = DeepLIIFImgMaskDataset(dataset_ihc_val_path,
                                                  img_transform=transforms.Compose([transforms.ToTensor(),
-                                                                                   transforms.Normalize((0.5, 0.5, 0.5),
-                                                                                                        (0.5, 0.5,
-                                                                                                         0.5))]),
+                                                                                   transforms.Normalize((mean, mean, mean),
+                                                                                                        (std, std,
+                                                                                                         std))]),
                                                  mask_transform=transforms.ToTensor())
     else:
         raise NotImplementedError
@@ -110,7 +113,7 @@ def main():
             recalls = []
             model.train()
             for data, target in dataloader_ihc_train:
-                data_aug = create_data_ihc_aug(data, color_transform).to(device)
+                data_aug = create_data_ihc_aug(data, color_transform, mean, std).to(device)
                 data, target = data.to(device), target.to(device)
                 model.zero_grad()
                 pred = model(data)

@@ -35,6 +35,10 @@ def main():
     args = parser.parse_args()
 
     Path(args.exp_save_path).mkdir(parents=True, exist_ok=True)
+
+    mean = 0.5
+    std = 0.5
+
     if args.dataset_name == "deepliif":
         dataset_ihc_train_path = os.path.join(args.dataihcroot_images, "DeepLIIF_Training_Set")
         dataset_ihc = DeepLIIFImgDataset(dataset_ihc_train_path,
@@ -48,8 +52,8 @@ def main():
                                                  [transforms.RandomCrop((256, 256)),
                                                   transforms.Resize((256, 256))]),
                                              transforms.ToTensor(),
-                                             transforms.Normalize((0.5, 0.5, 0.5),
-                                                                  (0.5, 0.5, 0.5))]))
+                                             transforms.Normalize((mean, mean, mean),
+                                                                  (std, std, std))]))
     elif args.dataset_name == "warwick":
         dataset_ihc_train_path = os.path.join(args.dataihcroot_images, "Warwick_Training_Set")
         dataset_ihc = WarwickImgDataset(dataset_ihc_train_path,
@@ -63,8 +67,8 @@ def main():
                                                 [transforms.RandomCrop((256, 256)),
                                                  transforms.Resize((256, 256))]),
                                             transforms.ToTensor(),
-                                            transforms.Normalize((0.5, 0.5, 0.5),
-                                                                 (0.5, 0.5, 0.5))]))
+                                            transforms.Normalize((mean, mean, mean),
+                                                                 (std, std, std))]))
     else:
         raise NotImplementedError
 
@@ -133,10 +137,10 @@ def main():
                 dataloader_iterator = iter(dataloader_masks)
                 data_mask = next(dataloader_iterator)
 
-            data_ihc_aug = create_data_ihc_aug(data_ihc, color_transform).to(device)
+            data_ihc_aug = create_data_ihc_aug(data_ihc, color_transform, mean, std).to(device)
 
             if args.dataset_name == "warwick":
-                data_ihc_h = decompose_stain(data_ihc)[0].to(device)
+                data_ihc_h = decompose_stain(data_ihc, mean, std)[0].to(device)
 
             data_ihc = data_ihc.to(device)
             data_mask = data_mask.to(device)
