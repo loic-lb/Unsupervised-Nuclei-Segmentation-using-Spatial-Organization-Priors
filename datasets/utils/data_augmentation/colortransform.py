@@ -20,7 +20,7 @@ def create_color_transform(mean=1.0, std=0.03):
         img = np.asarray(img)
         hdx = skcolor.separate_stains(img, skcolor.hdx_from_rgb)
         alphas = np.random.normal(size=(1, 1, 3), loc=mean, scale=std)
-        hdx = np.clip(hdx * alphas, 0, 1)
+        hdx = hdx * alphas
         img = skcolor.combine_stains(hdx, skcolor.rgb_from_hdx).astype(np.float32)
         return torch.tensor(img)
 
