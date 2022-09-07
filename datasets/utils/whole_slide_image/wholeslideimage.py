@@ -6,7 +6,6 @@ import openslide
 import pickle
 import numpy as np
 import pandas as pd
-import multiprocessing as mp
 from pathlib import Path
 from PIL import Image
 
@@ -169,14 +168,11 @@ class WholeSlideImage(object):
         x_pos, y_pos = np.meshgrid(np.arange(len(x_range)), np.arange(len(y_range)), indexing='ij')
         pos_candidates = np.array([x_pos.flatten(), y_pos.flatten()]).transpose()
 
-        num_workers = mp.cpu_count()
-        pool = mp.Pool(num_workers)
-
         iterable = [(coord, cont_check_fn, self.path, patch_level, patch_size, pos_candidates[i]) for
                     i, coord in enumerate(coord_candidates)]
 
-        results = pool.starmap(self.process_coord_candidate, iterable)
-        pool.close()
+        results = [self.process_coord_candidate(*it) for it in iterable]
+
         results = np.array([result for result in results if result is not None])
 
         print(

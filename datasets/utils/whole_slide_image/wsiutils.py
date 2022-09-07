@@ -55,7 +55,7 @@ def isWhitePatch_HLS(patch, lightThresh=210, percentage=0.2):
     return True if (patch_hls[:, :, 1]>lightThresh).sum() > num_pixels * percentage else False
 
 def remove_black_areas(slide):
-    slidearr = np.asarray(slide)
+    slidearr = np.asarray(slide).copy()
     indices = np.where(np.all(slidearr == (0, 0, 0), axis=-1))
     slidearr[indices] = [255, 255, 255]
     return Image.fromarray(slidearr.astype("uint8"))
