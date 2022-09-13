@@ -7,7 +7,7 @@ from tqdm import tqdm
 from time import sleep
 from datasets.utils import DeepLIIFImgMaskDataset, create_color_transform, create_data_ihc_aug
 from models import CustomUnet, load_optimal_hyperparameters
-from performance import dice, f1_m, precision_m, recall_m
+from performance import dice, f1_m, precision_m, recall_m, dice_by_sample
 
 
 def dice_coef_loss(pred, targs):
@@ -91,11 +91,6 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=optimal_parameters["learning_rate"],
                                  betas=(0.9, 0.999), weight_decay=optimal_parameters["decay"])
     model = model.to(device)
-
-    train_losses = []
-    val_losses = []
-    train_perf = []
-    val_perf = []
     best_score = 0
 
     for epoch in range(args.num_epochs):
@@ -104,8 +99,6 @@ def main():
         precisions = []
         recalls = []
         dice_scores = []
-        train_loss = 0
-        cumul_perf = 0
         with tqdm(dataloader_ihc_train, unit="batch") as tepoch:
             tepoch.set_description(f"Epoch {epoch}, training :")
             for data, target in tepoch:
@@ -117,40 +110,26 @@ def main():
                 pred_aug = model(data_aug)
                 loss_consistency = criterion_consistency(pred, pred_aug)
                 err_train = dice_coef_loss(pred, target) + loss_consistency
-                train_loss += err_train.item()
                 err_train.backward()
                 optimizer.step()
                 pred = (pred > 0.5).float()
                 perf = f1_m(pred, target).cpu().item()
-                cumul_perf += perf
                 tepoch.set_postfix(loss=err_train.item(), f1_score=perf)
                 sleep(0.1)
-        train_losses.append(train_loss / len(dataloader_ihc_train))
-        train_perf.append(cumul_perf / len(dataloader_ihc_train))
 
-        val_loss = 0
-        cumul_perf = 0
         with torch.no_grad():
             for data, target in dataloader_ihc_val:
-                data_aug = create_data_ihc_aug(data, color_transform, mean, std).to(device)
                 data, target = data.to(device), target.to(device)
                 model.eval()
                 pred = model(data)
-                pred_aug = model(data_aug)
-                loss_consistency = criterion_consistency(pred, pred_aug)
-                err_val = dice_coef_loss(pred, target) + loss_consistency
-                val_loss += err_val.item()
                 pred = (pred > 0.5).float()
                 perf = f1_m(pred, target).cpu().item()
-                cumul_perf += perf
                 accuracies.append(((pred == target).sum(axis=(1, 2, 3)) / target[0].numel()).mean().cpu().item())
-                f1_scores.append(f1_m(pred, target).cpu().item())
+                f1_scores.append(perf)
                 precisions.append(precision_m(pred, target).cpu().item())
                 recalls.append(recall_m(pred, target).cpu().item())
-                dice_scores.append(dice(pred, target).cpu().item())
+                dice_scores.append(dice_by_sample(pred, target).cpu().item())
 
-        val_losses.append(val_loss / len(dataloader_ihc_val))
-        val_perf.append(cumul_perf / len(dataloader_ihc_val))
         score = np.mean(f1_scores)
         print(f"Averaged validation : acc = {np.mean(accuracies)}, Dice = {np.mean(dice_scores)}, "
               f"F1 score = {score}, precision = {np.mean(precisions)}, recall = {np.mean(recalls)}")

@@ -68,7 +68,7 @@ class WholeSlideImage(object):
         return element
 
     def segmentTissue(self, seg_level=5, window_avg=3, window_eng=3, thresh=90, keep_grayscale=False, inv=False,
-                      start=(50, 50), area_min=5e3):
+                      start=(45, 45), area_min=5e3):
         contours_slide = []
 
         img = self.load_slide(seg_level)
@@ -180,8 +180,6 @@ class WholeSlideImage(object):
         self.patches.append(results)
 
     def save_patches(self, output_dir, patch_level, patch_size):
-        for patches_contour in self.patches:
-            print(len(patches_contour))
         work_path = os.path.join(output_dir, self.name, "Patches")
         Path(work_path).mkdir(parents=True, exist_ok=True)
         for i, patches_contour in enumerate(self.patches):

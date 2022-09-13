@@ -33,7 +33,7 @@ the patch extraction by setting value to 0 (remaining artifacts, control tissue,
 * ```--extract_patches``` performs patch extraction after contours segmentation (needs contours.csv and pickle files
 resulting from the contour segmentation).
 
-To reproduce the datasets used in the paper, please first segment the contours, and then use the provided 
+To reproduce the datasets used in the paper, please use the provided contours pickle files in ```contour_files```, and 
 ```contours.csv``` file to extract patches.
 
 ```sample_patch_Warwick.py``` samples extracted patches using KMeans partition to extract representatives elements:
