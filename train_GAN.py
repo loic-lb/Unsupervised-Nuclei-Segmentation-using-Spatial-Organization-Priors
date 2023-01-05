@@ -7,7 +7,7 @@ import torchvision.utils as vutils
 from pathlib import Path
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from datasets.utils import DeepLIIFImgDataset, WarwickImgDataset, PannukeMasksDataset, create_color_transform, \
+from datasets.utils import DeepLIIFImgDataset, WarwickImgDataset, PannukeMasksDataset, create_stain_aug_transform, \
     create_data_ihc_aug
 from models import Generator, Discriminator, decompose_stain
 from performance import generate_examples, save_generated_examples
@@ -84,7 +84,9 @@ def main():
     device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
     fixed_images = next(iter(dataloader_ihc)).to(device)
     save_generated_examples(args.exp_save_path, vutils.make_grid(fixed_images.cpu(), padding=2, normalize=True), suffix="input_images")
-    color_transform = create_color_transform(1, 0.75)
+    stain_aug_transform = create_stain_aug_transform(1, 0.1)
+    color_jitter_transform = transforms.ColorJitter(.5, .1, 0.5)
+
 
     if args.remove_loss == "r=1":
         netG_ihc_to_mask = Generator(r=1).to(device)
@@ -137,7 +139,8 @@ def main():
                 dataloader_iterator = iter(dataloader_masks)
                 data_mask = next(dataloader_iterator)
 
-            data_ihc_aug = create_data_ihc_aug(data_ihc, color_transform, mean, std).to(device)
+            data_ihc_aug = create_data_ihc_aug(data_ihc, stain_aug_transform, mean, std).to(device)
+            data_ihc_aug = color_jitter_transform(data_ihc_aug)
 
             if args.dataset_name == "warwick":
                 data_ihc_h = decompose_stain(data_ihc, mean, std)[0].to(device)
@@ -156,9 +159,6 @@ def main():
             fake_ihc_to_mask_aug = netG_ihc_to_mask(data_ihc_aug)
             fake_mask_to_ihc = netG_mask_to_ihc(data_mask)
 
-            # Consistency loss
-
-            loss_consistency = 1. * criterion_identity(fake_ihc_to_mask, fake_ihc_to_mask_aug)
 
             true_ihc = netD_ihc(fake_mask_to_ihc)
             true_mask = netD_mask(fake_ihc_to_mask)
@@ -173,6 +173,7 @@ def main():
             # Cycle loss
 
             recov_ihc = netG_mask_to_ihc(fake_ihc_to_mask)
+
             if args.dataset_name == "warwick":
                 loss_cycle_ihc = criterion_cycle(recov_ihc, data_ihc_h)
             else:
@@ -181,6 +182,10 @@ def main():
             loss_cycle_mask = criterion_cycle(recov_mask, data_mask)
 
             loss_cycle = 10. * (loss_cycle_ihc + loss_cycle_mask) / 2
+
+            # Consistency loss
+
+            loss_consistency = 1. * (criterion_identity(fake_ihc_to_mask, fake_ihc_to_mask_aug))
 
             if args.remove_loss == "cycle":
                 loss_G = loss_GAN + loss_consistency

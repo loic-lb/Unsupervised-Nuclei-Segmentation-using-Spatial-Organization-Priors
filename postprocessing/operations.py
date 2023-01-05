@@ -7,7 +7,7 @@ from skimage.segmentation import watershed
 def compute_morphological_operations(img, erosion=False):
     img = nd.median_filter(img, size=5)
     if erosion:
-        img = skmorphology.binary_erosion(img, skmorphology.disk(5))
+        img = skmorphology.binary_erosion(img, skmorphology.disk(2))
     img = nd.binary_opening(img, structure=skmorphology.disk(2)).astype(int)
     img = nd.binary_closing(img, structure=skmorphology.disk(2)).astype(int)
     img = nd.binary_opening(img, structure=skmorphology.disk(1)).astype(int)

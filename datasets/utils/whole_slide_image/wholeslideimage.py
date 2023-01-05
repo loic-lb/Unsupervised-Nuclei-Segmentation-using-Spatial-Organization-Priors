@@ -182,7 +182,7 @@ class WholeSlideImage(object):
     def save_patches(self, output_dir, patch_level, patch_size):
         work_path = os.path.join(output_dir, self.name, "Patches")
         Path(work_path).mkdir(parents=True, exist_ok=True)
-        for i, patches_contour in enumerate(self.patches):
+        for contour_index, patches_contour in enumerate(self.patches):
             for c, pos in patches_contour:
                 patch = self.wsi.read_region(c, patch_level, tuple([patch_size, patch_size])).convert('RGB')
-                patch.save(os.path.join(work_path, f"roi-{pos[0]}_{pos[1]}.png"))
+                patch.save(os.path.join(work_path, f"contour_{contour_index}-roi-{pos[0]}_{pos[1]}.png"))

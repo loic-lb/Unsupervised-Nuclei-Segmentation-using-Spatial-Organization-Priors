@@ -52,13 +52,13 @@ class isInContourV3_Hard:
 def isWhitePatch_HLS(patch, lightThresh=210, percentage=0.2):
     num_pixels = patch.size[0] * patch.size[1]
     patch_hls = cv2.cvtColor(np.array(patch), cv2.COLOR_RGB2HLS)
-    return True if (patch_hls[:, :, 1]>lightThresh).sum() > num_pixels * percentage else False
+    return True if (patch_hls[:, :, 1] > lightThresh).sum() > num_pixels * percentage else False
 
 def remove_black_areas(slide):
     slidearr = np.asarray(slide).copy()
     indices = np.where(np.all(slidearr == (0, 0, 0), axis=-1))
     slidearr[indices] = [255, 255, 255]
-    return Image.fromarray(slidearr.astype("uint8"))
+    return Image.fromarray(slidearr)
 
 
 def local_average(img, window_size, keep_grayscale):

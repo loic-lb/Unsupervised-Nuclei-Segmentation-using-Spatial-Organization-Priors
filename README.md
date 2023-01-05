@@ -1,5 +1,11 @@
 # Unsupervised Nuclei Segmentation using Spatial Organization Priors
 
+## Updates from master branch
+* Added new model for HER2 DAISY data that can be found [here](https://drive.google.com/drive/folders/1qSBd6_m5omPAGijiDa2BRhZDAtxcaRxL?usp=sharing).
+* Implemented a new stain deconvolution method based on [this approach](https://www.spiedigitallibrary.org/conference-proceedings-of-spie/10581/105810L/Automatic-color-unmixing-of-IHC-stained-whole-slide-images/10.1117/12.2293734.short?SSO=1).
+* Replaced batch normalization by instance normalization for both generators and discriminators.
+* Added color jittering to stain augmentation for consistency loss.
+
 Code for training and benchmarking unsupervised and supervised methods on several dataset of H-DAB stained immunohistochemistry images for nuclei segmentation. 
 * ```train_GAN.py``` trains the proposed cycle GAN model for a given IHC dataset and ground truth masks of 
 nuclei segmentation from any source. 
@@ -19,7 +25,7 @@ conda env create -f environment.yml
 
 4 datasets were used in this paper:
 * **Deepliif**: Set of 1667 registered 512x512 IHC images built to train the DEEPLIIF algorithm; only the original Ki67 stained 
-and the nuclei segmentation images were used - see [here](https://zenodo.org/record/4751737#.YlWRiN86-Ul) for the data.
+and the nuclentation images were used - see [here](https://zenodo.org/record/4751737#.YlWRiN86-Ul) for the data.
 * **Warwick**: Set of 86 HER2 stained WSIs - see [here](https://warwick.ac.uk/fac/cross_fac/tia/data/her2contest) for more details and request access to the data.
 * **BCDataset**: Set of 1338 640x640 IHC images stained for Ki67 with cell center annotations - see [here](https://sites.google.com/view/bcdataset) for more details and retrieve the data.
 * **Pannuke**: Set of more than 7000 256x256 H&E stained images with corresponding nuclei segmentation - see [here](https://jgamper.github.io/PanNukeDataset/) for more details and retrieve the data.
@@ -66,7 +72,7 @@ The pretrained models can be retrieved [here](https://drive.google.com/drive/fol
 3 methods were used to benchmark the proposed method:
 * Qupath software with Stardist plugin. The scripts are available [here](existing_methods/stardist).
 * Nuclick algorithm to extract mask segmentation from nuclei center annotations. The code of Nuclick can be retrieved [here](https://github.com/navidstuv/NuClick), and the code for this paper [here](existing_methods/nuclick).
-* A baseline thresholding approach, using color deconvolution for membranous staining. The code is available [here](existing_methods/thresholding)
+* A baseline thresholding approach, using color deconvolution for membranous staining. The code is available [here](existing_methods/thresholding).
 
 ## Acknowledgement
 
